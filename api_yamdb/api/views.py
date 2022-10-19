@@ -1,4 +1,5 @@
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from api.permissions import AdminOnlyPermission, SafeMethodOnlyPermission
+from api.serializers import CategorySerializer, GenreSerializer
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
@@ -11,8 +12,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title, User
 
-from api.permissions import AdminOnlyPermission, SafeMethodOnlyPermission
-from api.serializers import CategorySerializer, GenreSerializer
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAuthorOrReadOnly
@@ -101,8 +101,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=id)
-        new_queryset = title.reviews.all()
-        return new_queryset
+        return title.reviews.all()
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
@@ -117,8 +116,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=id)
-        new_queryset = review.comments.all()
-        return new_queryset
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review_id = self.kwargs.get('review_id')
